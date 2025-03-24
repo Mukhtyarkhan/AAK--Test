@@ -47,7 +47,6 @@ def create_task(request):
     serializer = TaskSerializer(data=request.data)
     if serializer.is_valid():
         task = serializer.save()
-        # Handle labels if provided
         label_ids = request.data.get('labels', [])
         for label_id in label_ids:
             try:
@@ -65,7 +64,6 @@ def update_task(request, task_id):
     serializer = TaskSerializer(task, data=request.data, partial=True)
     if serializer.is_valid():
         updated_task = serializer.save()
-        # Update labels if provided
         if 'labels' in request.data:
             task.labels.clear()
             for label_id in request.data['labels']:
@@ -84,27 +82,9 @@ def delete_task(request, task_id):
     task.delete()
     return Response({"message": "Task deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def user_tasks(request):
-#     tasks = Task.objects.all()  # You might want to filter by owner if needed
-#     serializer = TaskSerializer(tasks, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def task_detail(request, task_id):
-#     task = get_object_or_404(Task, id=task_id)
-#     serializer = TaskSerializer(task)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def toggle_task_completion(request, task_id):
-#     task = get_object_or_404(Task, id=task_id)
-#     task.completed = not task.completed
-#     task.save()
-#     return Response(
-#         {"message": "Task completion toggled", "completed": task.completed},
-#         status=status.HTTP_200_OK
-#     )
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_tasks(request):
+    tasks = Task.objects.all()  
+    serializer = TaskSerializer(tasks, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
